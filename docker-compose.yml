@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  task:
+    container_name: task
+    image: jahidshohel/task-backend:latest
+    restart: always
+    depends_on:
+      - mysql
+    links:
+      - "mysql:mysql"
+    ports:
+      - "8080:8080"
+    networks:
+      - task-network
+
+  track-frontend:
+    container_name: track-frontend
+    image: jahidshohel/task-frontend:latest
+    restart: always
+    depends_on:
+      - task
+    ports:
+      - "7070:7070"
+    networks:
+      - task-network
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=task
+    networks:
+      - task-network
+    volumes:
+      - ./mysql/:/var/lib/mysql
+
+networks:
+  task-network:
+    driver: bridge
